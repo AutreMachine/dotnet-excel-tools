@@ -58,20 +58,22 @@ internal static class OpenXmlReader
         List<string> sharedStrings,
         HashSet<uint> dateStyleIndices)
     {
-        switch (cell.DataType?.Value)
+        var dataType = cell.DataType?.Value;
+        if (dataType == CellValues.SharedString)
         {
-            case CellValues.SharedString:
-                if (int.TryParse(cell.CellValue?.Text, out int ssIdx) && ssIdx < sharedStrings.Count)
-                    target.SetCellValue(sharedStrings[ssIdx]);
-                return;
-
-            case CellValues.Boolean:
-                target.SetCellValue(cell.CellValue?.Text == "1");
-                return;
-
-            case CellValues.InlineString:
-                target.SetCellValue(cell.GetFirstChild<InlineString>()?.Text?.Text ?? cell.InnerText);
-                return;
+            if (int.TryParse(cell.CellValue?.Text, out int ssIdx) && ssIdx < sharedStrings.Count)
+                target.SetCellValue(sharedStrings[ssIdx]);
+            return;
+        }
+        if (dataType == CellValues.Boolean)
+        {
+            target.SetCellValue(cell.CellValue?.Text == "1");
+            return;
+        }
+        if (dataType == CellValues.InlineString)
+        {
+            target.SetCellValue(cell.GetFirstChild<InlineString>()?.Text?.Text ?? cell.InnerText);
+            return;
         }
 
         // Numeric (or date, which is stored as a number in Excel)
