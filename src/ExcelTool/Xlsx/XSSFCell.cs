@@ -1,6 +1,6 @@
-using ExcelTool.Interfaces;
+using AutreMachine.ExcelTools.Interfaces;
 
-namespace ExcelTool.Xlsx;
+namespace AutreMachine.ExcelTools.Xlsx;
 
 public class XSSFCell : ICell
 {

@@ -4,7 +4,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using OxCellFormat = DocumentFormat.OpenXml.Spreadsheet.CellFormat;
 
-namespace ExcelTool.Xlsx;
+namespace AutreMachine.ExcelTools.Xlsx;
 
 internal static class OpenXmlReader
 {

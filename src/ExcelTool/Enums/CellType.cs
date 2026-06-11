@@ -1,4 +1,4 @@
-namespace ExcelTool;
+namespace AutreMachine.ExcelTools;
 
 public enum CellType
 {

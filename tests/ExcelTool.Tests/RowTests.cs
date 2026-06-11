@@ -1,8 +1,8 @@
-using ExcelTool.Interfaces;
-using ExcelTool.Xlsx;
+using AutreMachine.ExcelTools.Interfaces;
+using AutreMachine.ExcelTools.Xlsx;
 using Xunit;
 
-namespace ExcelTool.Tests;
+namespace AutreMachine.ExcelTools.Tests;
 
 public class RowTests
 {

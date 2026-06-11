@@ -7,7 +7,7 @@ using OxFont = DocumentFormat.OpenXml.Spreadsheet.Font;
 using OxColor = DocumentFormat.OpenXml.Spreadsheet.Color;
 using OxBorderStyle = DocumentFormat.OpenXml.Spreadsheet.BorderStyleValues;
 
-namespace ExcelTool.Xlsx;
+namespace AutreMachine.ExcelTools.Xlsx;
 
 internal static class OpenXmlSerializer
 {

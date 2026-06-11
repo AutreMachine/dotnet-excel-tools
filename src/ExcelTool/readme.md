@@ -1,15 +1,16 @@
-using AutreMachine.ExcelTools;
-using AutreMachine.ExcelTools.Interfaces;
-using AutreMachine.ExcelTools.Xlsx;
+﻿# dotnet-excel-tools
 
-string outputDir = Path.Combine(AppContext.BaseDirectory, "output");
-Directory.CreateDirectory(outputDir);
+It is a simple dotnet library to read and create Excel files, coded because NPOI was using a compromised DLL (Cryptography) that could not pass building chain.
+It has been lazily 99% coded with Claude ! I really needed something quick - and not too dirty... so no credit for me.
+Feel free to use ! There is only one library reference, it should be reliable in time.
 
-Console.WriteLine("ExcelTool — Sample Tests");
-Console.WriteLine("========================");
+Usage is close to NPOI.
 
+* Creating a workbook :
+
+```
 // ─────────────────────────────────────────────────────────────────────────────
-// Test 1: Empty Excel file (one default sheet so Excel can open it)
+// Empty Excel file (one default sheet so Excel can open it)
 // ─────────────────────────────────────────────────────────────────────────────
 Console.WriteLine("\n[1] Creating an empty Excel file...");
 using (IWorkbook wb = new XSSFWorkbook())
@@ -19,9 +20,12 @@ using (IWorkbook wb = new XSSFWorkbook())
     wb.Write(path);
     Console.WriteLine($"    -> {path}");
 }
+```
 
+* Managing multiple worksheets :
+```
 // ─────────────────────────────────────────────────────────────────────────────
-// Test 2: Multiple worksheets in the same document
+// Multiple worksheets in the same document
 // ─────────────────────────────────────────────────────────────────────────────
 Console.WriteLine("\n[2] Creating a file with multiple worksheets...");
 using (IWorkbook wb = new XSSFWorkbook())
@@ -41,9 +45,13 @@ using (IWorkbook wb = new XSSFWorkbook())
     wb.Write(path);
     Console.WriteLine($"    -> {path}");
 }
+```
 
+* Creating different types of cells :
+
+```
 // ─────────────────────────────────────────────────────────────────────────────
-// Test 3: Different cell value types
+// Different cell value types
 // ─────────────────────────────────────────────────────────────────────────────
 Console.WriteLine("\n[3] Writing cells with different types...");
 using (IWorkbook wb = new XSSFWorkbook())
@@ -115,9 +123,13 @@ using (IWorkbook wb = new XSSFWorkbook())
     wb.Write(path);
     Console.WriteLine($"    -> {path}");
 }
+```
 
+* Styling cells :
+
+```
 // ─────────────────────────────────────────────────────────────────────────────
-// Test 4: Cell styles — fonts, fills, borders, alignment, number formats
+// Cell styles — fonts, fills, borders, alignment, number formats
 // ─────────────────────────────────────────────────────────────────────────────
 Console.WriteLine("\n[4] Writing styled cells...");
 using (IWorkbook wb = new XSSFWorkbook())
@@ -252,111 +264,13 @@ using (IWorkbook wb = new XSSFWorkbook())
     wb.Write(path);
     Console.WriteLine($"    -> {path}");
 }
+```
 
+* Loading a workbook :
+
+```
 // ─────────────────────────────────────────────────────────────────────────────
-// Test 5: Comprehensive — 3 sheets, all value types, multiple styles
-// ─────────────────────────────────────────────────────────────────────────────
-Console.WriteLine("\n[5] Comprehensive test (3 sheets, all types combined)...");
-using (IWorkbook wb = new XSSFWorkbook())
-{
-    // Sheet 1 — Cover page
-    ISheet cover = wb.CreateSheet("Cover");
-    IFont titleFont = wb.CreateFont();
-    titleFont.IsBold = true;
-    titleFont.FontHeightInPoints = 18;
-    ICellStyle titleStyle = wb.CreateCellStyle();
-    titleStyle.Font = titleFont;
-
-    IRow titleRow = cover.CreateRow(0);
-    ICell titleCell = titleRow.CreateCell(0);
-    titleCell.SetCellValue("ExcelTool — Comprehensive Report");
-    titleCell.CellStyle = titleStyle;
-
-    cover.CreateRow(2).CreateCell(0).SetCellValue("Generated on:");
-    ICell genDate = cover.GetRow(2)!.CreateCell(1);
-    genDate.SetCellValue(DateTime.Now);
-
-    cover.CreateRow(3).CreateCell(0).SetCellValue("Total sheets:");
-    cover.GetRow(3)!.CreateCell(1).SetCellValue(3.0);
-    cover.CreateRow(4).CreateCell(0).SetCellValue("Library:");
-    cover.GetRow(4)!.CreateCell(1).SetCellValue("ExcelTool (NPOI-compatible)");
-
-    cover.SetColumnWidth(0, 18 * 256);
-    cover.SetColumnWidth(1, 35 * 256);
-
-    // Sheet 2 — Monthly sales
-    ISheet sales = wb.CreateSheet("Sales");
-    ICellStyle moneyStyle = wb.CreateCellStyle();
-    moneyStyle.DataFormat = "€#,##0.00";
-    ICellStyle pctStyle = wb.CreateCellStyle();
-    pctStyle.DataFormat = "0.0%";
-
-    IRow salesHdr = sales.CreateRow(0);
-    salesHdr.CreateCell(0).SetCellValue("Month");
-    salesHdr.CreateCell(1).SetCellValue("Revenue");
-    salesHdr.CreateCell(2).SetCellValue("Growth");
-
-    string[] months   = { "Jan", "Feb", "Mar", "Apr", "May", "Jun" };
-    double[] revenues = { 12500, 14800, 13200, 17600, 19400, 21000 };
-    for (int i = 0; i < months.Length; i++)
-    {
-        IRow r = sales.CreateRow(i + 1);
-        r.CreateCell(0).SetCellValue(months[i]);
-        ICell rev = r.CreateCell(1);
-        rev.SetCellValue(revenues[i]);
-        rev.CellStyle = moneyStyle;
-        if (i > 0)
-        {
-            ICell growth = r.CreateCell(2);
-            growth.SetCellValue((revenues[i] - revenues[i - 1]) / revenues[i - 1]);
-            growth.CellStyle = pctStyle;
-        }
-    }
-    sales.SetColumnWidth(0, 10 * 256);
-    sales.SetColumnWidth(1, 14 * 256);
-    sales.SetColumnWidth(2, 12 * 256);
-
-    // Sheet 3 — Two-week calendar
-    ISheet calendar = wb.CreateSheet("Calendar");
-    ICellStyle wkdayStyle = wb.CreateCellStyle();
-    wkdayStyle.DataFormat = "dddd dd mmmm yyyy";
-
-    ICellStyle wkendStyle = wb.CreateCellStyle();
-    wkendStyle.DataFormat = "dddd dd mmmm yyyy";
-    wkendStyle.FillForegroundColor = "FFFFF2CC";
-    wkendStyle.FillPattern = FillPattern.SolidForeground;
-
-    IRow calHdr = calendar.CreateRow(0);
-    calHdr.CreateCell(0).SetCellValue("Date");
-    calHdr.CreateCell(1).SetCellValue("Day");
-    calHdr.CreateCell(2).SetCellValue("Weekend?");
-
-    DateTime start = new DateTime(2024, 6, 10);
-    for (int d = 0; d < 14; d++)
-    {
-        DateTime day = start.AddDays(d);
-        bool isWeekend = day.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;
-        IRow r = calendar.CreateRow(d + 1);
-
-        ICell dc = r.CreateCell(0);
-        dc.SetCellValue(day);
-        dc.CellStyle = isWeekend ? wkendStyle : wkdayStyle;
-
-        r.CreateCell(1).SetCellValue(day.DayOfWeek.ToString());
-        r.CreateCell(2).SetCellValue(isWeekend);
-    }
-    calendar.SetColumnWidth(0, 32 * 256);
-    calendar.SetColumnWidth(1, 14 * 256);
-    calendar.SetColumnWidth(2, 12 * 256);
-
-    string path = Path.Combine(outputDir, "test5_comprehensive.xlsx");
-    wb.Write(path);
-    Console.WriteLine($"    Sheets: {wb.NumberOfSheets}  ({string.Join(", ", Enumerable.Range(0, wb.NumberOfSheets).Select(i => wb.GetSheetAt(i).SheetName))})");
-    Console.WriteLine($"    -> {path}");
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Test 6: Load an existing workbook and read its cell values back
+// Load an existing workbook and read its cell values back
 // ─────────────────────────────────────────────────────────────────────────────
 Console.WriteLine("\n[6] Loading an existing workbook and reading cells back...");
 {
@@ -396,5 +310,4 @@ Console.WriteLine("\n[6] Loading an existing workbook and reading cells back..."
         Console.WriteLine($"      row {r}: [{typeName}] = {valueStr}");
     }
 }
-
-Console.WriteLine($"\nAll tests passed. Output folder: {outputDir}");
+```

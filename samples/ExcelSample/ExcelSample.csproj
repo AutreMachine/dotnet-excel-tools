@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\ExcelTool\ExcelTool.csproj" />
+    <ProjectReference Include="..\..\src\ExcelTool\AutreMachine.ExcelTools.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

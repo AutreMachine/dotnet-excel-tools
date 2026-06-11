@@ -3,7 +3,7 @@
     <Project Path="samples/ExcelSample/ExcelSample.csproj" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src/ExcelTool/ExcelTool.csproj" />
+    <Project Path="src/ExcelTool/AutreMachine.ExcelTools.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/ExcelTool.Tests/ExcelTool.Tests.csproj" />

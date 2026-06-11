@@ -1,4 +1,4 @@
-namespace ExcelTool.Interfaces;
+namespace AutreMachine.ExcelTools.Interfaces;
 
 public interface ISheet
 {
