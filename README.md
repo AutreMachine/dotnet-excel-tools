@@ -124,3 +124,190 @@ using (IWorkbook wb = new XSSFWorkbook())
     Console.WriteLine($"    -> {path}");
 }
 ```
+
+* Styling cells :
+
+```
+// ─────────────────────────────────────────────────────────────────────────────
+// Cell styles — fonts, fills, borders, alignment, number formats
+// ─────────────────────────────────────────────────────────────────────────────
+Console.WriteLine("\n[4] Writing styled cells...");
+using (IWorkbook wb = new XSSFWorkbook())
+{
+    ISheet sheet = wb.CreateSheet("Styled");
+
+    // Bold white-on-blue header
+    IFont headerFont = wb.CreateFont();
+    headerFont.IsBold = true;
+    headerFont.FontHeightInPoints = 13;
+    headerFont.Color = "FFFFFFFF";
+
+    ICellStyle headerStyle = wb.CreateCellStyle();
+    headerStyle.Font = headerFont;
+    headerStyle.Alignment = HorizontalAlignment.Center;
+    headerStyle.VerticalAlignment = VerticalAlignment.Center;
+    headerStyle.FillForegroundColor = "FF2E75B6";
+    headerStyle.FillPattern = FillPattern.SolidForeground;
+    headerStyle.BorderBottom = BorderStyle.Medium;
+
+    string[] headers = { "Name", "Score", "Grade", "Date", "Active" };
+    IRow headerRow = sheet.CreateRow(0);
+    headerRow.Height = 22;
+    for (int c = 0; c < headers.Length; c++)
+    {
+        ICell hc = headerRow.CreateCell(c);
+        hc.SetCellValue(headers[c]);
+        hc.CellStyle = headerStyle;
+    }
+
+    // Thin-border base style
+    ICellStyle dataStyle = wb.CreateCellStyle();
+    dataStyle.BorderTop = BorderStyle.Thin;
+    dataStyle.BorderBottom = BorderStyle.Thin;
+    dataStyle.BorderLeft = BorderStyle.Thin;
+    dataStyle.BorderRight = BorderStyle.Thin;
+
+    // Numeric format
+    ICellStyle numStyle = wb.CreateCellStyle();
+    numStyle.DataFormat = "#,##0.00";
+    numStyle.Alignment = HorizontalAlignment.Right;
+    numStyle.BorderTop = BorderStyle.Thin;
+    numStyle.BorderBottom = BorderStyle.Thin;
+    numStyle.BorderLeft = BorderStyle.Thin;
+    numStyle.BorderRight = BorderStyle.Thin;
+
+    // Date style
+    ICellStyle dateStyle2 = wb.CreateCellStyle();
+    dateStyle2.DataFormat = "dd-mmm-yyyy";
+    dateStyle2.Alignment = HorizontalAlignment.Center;
+    dateStyle2.BorderTop = BorderStyle.Thin;
+    dateStyle2.BorderBottom = BorderStyle.Thin;
+    dateStyle2.BorderLeft = BorderStyle.Thin;
+    dateStyle2.BorderRight = BorderStyle.Thin;
+
+    // Italic red for low scores
+    IFont redFont = wb.CreateFont();
+    redFont.IsItalic = true;
+    redFont.Color = "FFCC0000";
+
+    ICellStyle redNumStyle = wb.CreateCellStyle();
+    redNumStyle.Font = redFont;
+    redNumStyle.DataFormat = "#,##0.00";
+    redNumStyle.Alignment = HorizontalAlignment.Right;
+    redNumStyle.BorderTop = BorderStyle.Thin;
+    redNumStyle.BorderBottom = BorderStyle.Thin;
+    redNumStyle.BorderLeft = BorderStyle.Thin;
+    redNumStyle.BorderRight = BorderStyle.Thin;
+
+    // Alternating row background styles
+    ICellStyle altStyle = wb.CreateCellStyle();
+    altStyle.FillForegroundColor = "FFE9EFF7";
+    altStyle.FillPattern = FillPattern.SolidForeground;
+    altStyle.BorderTop = BorderStyle.Thin;
+    altStyle.BorderBottom = BorderStyle.Thin;
+    altStyle.BorderLeft = BorderStyle.Thin;
+    altStyle.BorderRight = BorderStyle.Thin;
+
+    ICellStyle altNumStyle = wb.CreateCellStyle();
+    altNumStyle.FillForegroundColor = "FFE9EFF7";
+    altNumStyle.FillPattern = FillPattern.SolidForeground;
+    altNumStyle.DataFormat = "#,##0.00";
+    altNumStyle.Alignment = HorizontalAlignment.Right;
+    altNumStyle.BorderTop = BorderStyle.Thin;
+    altNumStyle.BorderBottom = BorderStyle.Thin;
+    altNumStyle.BorderLeft = BorderStyle.Thin;
+    altNumStyle.BorderRight = BorderStyle.Thin;
+
+    ICellStyle altDateStyle = wb.CreateCellStyle();
+    altDateStyle.FillForegroundColor = "FFE9EFF7";
+    altDateStyle.FillPattern = FillPattern.SolidForeground;
+    altDateStyle.DataFormat = "dd-mmm-yyyy";
+    altDateStyle.Alignment = HorizontalAlignment.Center;
+    altDateStyle.BorderTop = BorderStyle.Thin;
+    altDateStyle.BorderBottom = BorderStyle.Thin;
+    altDateStyle.BorderLeft = BorderStyle.Thin;
+    altDateStyle.BorderRight = BorderStyle.Thin;
+
+    var records = new (string name, double score, string grade, DateTime date, bool active)[]
+    {
+        ("Alice",  98.50, "A+", new DateTime(2024,  1, 10), true),
+        ("Bob",    54.30, "D",  new DateTime(2024,  2, 14), false),
+        ("Carol",  87.00, "B+", new DateTime(2024,  3, 22), true),
+        ("David",  43.75, "F",  new DateTime(2024,  4,  5), false),
+        ("Eve",    92.10, "A",  new DateTime(2024,  5, 30), true),
+    };
+
+    for (int i = 0; i < records.Length; i++)
+    {
+        var (name, score, grade, date, active) = records[i];
+        bool alt = i % 2 == 1;
+        IRow row = sheet.CreateRow(i + 1);
+
+        ICellStyle textSt  = alt ? altStyle : dataStyle;
+        ICellStyle scoreSt = score < 60 ? redNumStyle : (alt ? altNumStyle : numStyle);
+        ICellStyle dateSt  = alt ? altDateStyle : dateStyle2;
+
+        ICell nc = row.CreateCell(0); nc.SetCellValue(name);  nc.CellStyle = textSt;
+        ICell sc = row.CreateCell(1); sc.SetCellValue(score); sc.CellStyle = scoreSt;
+        ICell gc = row.CreateCell(2); gc.SetCellValue(grade); gc.CellStyle = textSt;
+        ICell dc = row.CreateCell(3); dc.SetCellValue(date);  dc.CellStyle = dateSt;
+        ICell ac = row.CreateCell(4); ac.SetCellValue(active);ac.CellStyle = textSt;
+    }
+
+    sheet.SetColumnWidth(0, 16 * 256);
+    sheet.SetColumnWidth(1, 12 * 256);
+    sheet.SetColumnWidth(2, 10 * 256);
+    sheet.SetColumnWidth(3, 15 * 256);
+    sheet.SetColumnWidth(4, 10 * 256);
+
+    string path = Path.Combine(outputDir, "test4_styled.xlsx");
+    wb.Write(path);
+    Console.WriteLine($"    -> {path}");
+}
+```
+
+* Loading a workbook :
+
+```
+// ─────────────────────────────────────────────────────────────────────────────
+// Load an existing workbook and read its cell values back
+// ─────────────────────────────────────────────────────────────────────────────
+Console.WriteLine("\n[6] Loading an existing workbook and reading cells back...");
+{
+    string sourcePath = Path.Combine(outputDir, "test3_celltypes.xlsx");
+    using IWorkbook wb = new XSSFWorkbook(sourcePath);      // NPOI-style constructor
+    // Same result: using IWorkbook wb = XSSFWorkbook.Open(sourcePath);
+
+    Console.WriteLine($"    Loaded '{sourcePath}'");
+    Console.WriteLine($"    Sheets: {wb.NumberOfSheets}");
+
+    ISheet sheet = wb.GetSheetAt(0);
+    Console.WriteLine($"    Sheet name: {sheet.SheetName}");
+    Console.WriteLine($"    Rows: {sheet.LastRowNum - sheet.FirstRowNum + 1}");
+
+    // Read and print each data row (skip header row 0)
+    for (int r = 1; r <= sheet.LastRowNum; r++)
+    {
+        IRow? row = sheet.GetRow(r);
+        if (row is null) continue;
+
+        ICell? typeCell  = row.GetCell(0);
+        ICell? valueCell = row.GetCell(1);
+        if (typeCell is null || valueCell is null) continue;
+
+        string typeName = typeCell.StringCellValue;
+        string valueStr = valueCell.CellType switch
+        {
+            CellType.String  => valueCell.StringCellValue,
+            CellType.Numeric => valueCell.IsDateTimeCell
+                                    ? valueCell.DateCellValue.ToString("yyyy-MM-dd HH:mm:ss")
+                                    : valueCell.NumericCellValue.ToString("G"),
+            CellType.Boolean => valueCell.BooleanCellValue.ToString(),
+            CellType.Blank   => "(blank)",
+            _                => $"({valueCell.CellType})"
+        };
+
+        Console.WriteLine($"      row {r}: [{typeName}] = {valueStr}");
+    }
+}
+```
